@@ -220,9 +220,9 @@ def parse_toml_safe(path: Path) -> dict[str, Any]:
     try:
         # Python 3.11+ has tomllib in stdlib
         try:
-            import tomllib  # type: ignore
+            import tomllib  # type: ignore[import-untyped]
         except ImportError:
-            import tomli as tomllib  # type: ignore
+            import tomli as tomllib  # type: ignore[import-untyped,unused-ignore]
 
         with path.open("rb") as f:
             content = f.read()

@@ -74,6 +74,23 @@ from .utils import (
     validate_toml_structure,
 )
 
+# Phase 2 modules
+from .config_manager import ConfigManager
+from .command_builder import CommandBuilder
+from .installation_strategy import (
+    InstallationStrategy as BaseInstallationStrategy,
+    JSONManipulationStrategy,
+    NativeCLIStrategy,
+    TOMLManipulationStrategy,
+)
+
+# Platform-specific implementations
+from .platforms import (
+    ClaudeCodeStrategy,
+    CodexStrategy,
+    CursorStrategy,
+)
+
 __all__ = [
     # Version
     "__version__",
@@ -111,4 +128,15 @@ __all__ = [
     "resolve_command_path",
     "validate_json_structure",
     "validate_toml_structure",
+    # Phase 2 modules
+    "ConfigManager",
+    "CommandBuilder",
+    "BaseInstallationStrategy",
+    "NativeCLIStrategy",
+    "JSONManipulationStrategy",
+    "TOMLManipulationStrategy",
+    # Platform implementations
+    "ClaudeCodeStrategy",
+    "CursorStrategy",
+    "CodexStrategy",
 ]
