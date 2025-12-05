@@ -158,9 +158,6 @@ class NativeCLIStrategy(InstallationStrategy):
         # Build CLI command
         cmd = self._build_cli_command(server, scope)
 
-        # Mask credentials for logging
-        masked_cmd = self._mask_command(cmd)
-
         try:
             # Execute CLI command
             result = subprocess.run(cmd, capture_output=True, text=True, timeout=30)

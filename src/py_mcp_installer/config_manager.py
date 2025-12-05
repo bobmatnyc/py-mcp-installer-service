@@ -21,10 +21,7 @@ import json
 from pathlib import Path
 from typing import Any
 
-try:
-    import tomllib  # Python 3.11+  # type: ignore[import-untyped]
-except ImportError:
-    pass  # type: ignore[import-untyped,unused-ignore]
+# tomllib is imported conditionally in parse_toml_safe utility
 
 try:
     import tomli_w  # For TOML writing  # type: ignore[import-untyped]
@@ -245,7 +242,10 @@ class ConfigManager:
         if server.name in config[servers_key]:
             raise ValidationError(
                 f"Server '{server.name}' already exists in configuration",
-                recovery_suggestion="Use update_server() to modify existing server, or remove it first",
+                recovery_suggestion=(
+                    "Use update_server() to modify existing server, "
+                    "or remove it first"
+                ),
             )
 
         # Build server config dict
