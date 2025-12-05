@@ -1,4 +1,4 @@
-.PHONY: help install install-dev test lint format type-check clean
+.PHONY: help install install-dev test lint format type-check clean release-patch release-minor release-major version
 
 help:
 	@echo "Available commands:"
@@ -9,6 +9,10 @@ help:
 	@echo "  make format        - Format code with black"
 	@echo "  make type-check    - Run type checker"
 	@echo "  make clean         - Clean build artifacts"
+	@echo "  make version       - Show current version"
+	@echo "  make release-patch - Release new patch version (0.0.x)"
+	@echo "  make release-minor - Release new minor version (0.x.0)"
+	@echo "  make release-major - Release new major version (x.0.0)"
 
 install:
 	pip install -e .
@@ -39,3 +43,15 @@ clean:
 	find . -type d -name ".pytest_cache" -exec rm -rf {} +
 	find . -type d -name ".mypy_cache" -exec rm -rf {} +
 	find . -type d -name ".ruff_cache" -exec rm -rf {} +
+
+release-patch:  ## Release new patch version (0.0.x)
+	@./scripts/release.sh patch
+
+release-minor:  ## Release new minor version (0.x.0)
+	@./scripts/release.sh minor
+
+release-major:  ## Release new major version (x.0.0)
+	@./scripts/release.sh major
+
+version:  ## Show current version
+	@python scripts/manage_version.py

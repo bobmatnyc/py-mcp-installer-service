@@ -28,7 +28,7 @@ Design Principles:
     - Clear error messages with recovery suggestions
 """
 
-__version__ = "0.1.0"
+__version__ = "0.0.3"
 
 # Core types
 from .types import (
