@@ -8,15 +8,18 @@ REPO_ROOT="$(dirname "$SCRIPT_DIR")"
 
 cd "$REPO_ROOT"
 
+# Detect Python executable
+PYTHON=$(command -v python3 2>/dev/null || command -v python 2>/dev/null)
+
 # Get bump type (default: patch)
 BUMP_TYPE="${1:-patch}"
 
 # Get current version
-CURRENT_VERSION=$(python scripts/manage_version.py)
+CURRENT_VERSION=$($PYTHON scripts/manage_version.py)
 echo "Current version: $CURRENT_VERSION"
 
 # Bump version
-NEW_VERSION=$(python scripts/manage_version.py bump "$BUMP_TYPE")
+NEW_VERSION=$($PYTHON scripts/manage_version.py bump "$BUMP_TYPE")
 echo "New version: $NEW_VERSION"
 
 # Commit version changes

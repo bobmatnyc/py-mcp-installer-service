@@ -1,3 +1,6 @@
+# Python executable detection
+PYTHON := $(shell command -v python3 2> /dev/null || command -v python 2> /dev/null)
+
 .PHONY: help install install-dev test lint format type-check clean release-patch release-minor release-major version
 
 help:
@@ -54,4 +57,4 @@ release-major:  ## Release new major version (x.0.0)
 	@./scripts/release.sh major
 
 version:  ## Show current version
-	@python scripts/manage_version.py
+	@$(PYTHON) scripts/manage_version.py
