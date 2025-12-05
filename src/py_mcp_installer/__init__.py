@@ -91,6 +91,10 @@ from .platforms import (
     CursorStrategy,
 )
 
+# Phase 3 modules
+from .mcp_inspector import InspectionReport, MCPInspector, ValidationIssue
+from .installer import MCPInstaller
+
 __all__ = [
     # Version
     "__version__",
@@ -139,4 +143,9 @@ __all__ = [
     "ClaudeCodeStrategy",
     "CursorStrategy",
     "CodexStrategy",
+    # Phase 3 modules
+    "MCPInstaller",
+    "MCPInspector",
+    "ValidationIssue",
+    "InspectionReport",
 ]
