@@ -13,7 +13,6 @@ Claude Code supports:
 from pathlib import Path
 
 from ..command_builder import CommandBuilder
-from ..exceptions import InstallationError
 from ..installation_strategy import (
     InstallationStrategy,
     JSONManipulationStrategy,
@@ -159,9 +158,7 @@ class ClaudeCodeStrategy:
         project_config = Path(".claude.json")
 
         has_config = (
-            global_config.exists()
-            or legacy_config.exists()
-            or project_config.exists()
+            global_config.exists() or legacy_config.exists() or project_config.exists()
         )
 
         # Check for CLI

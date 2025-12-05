@@ -24,7 +24,7 @@ from typing import Any
 try:
     import tomllib  # Python 3.11+  # type: ignore[import-untyped]
 except ImportError:
-    import tomli as tomllib  # type: ignore[import-untyped,unused-ignore]
+    pass  # type: ignore[import-untyped,unused-ignore]
 
 try:
     import tomli_w  # For TOML writing  # type: ignore[import-untyped]
@@ -33,7 +33,13 @@ except ImportError:
 
 from .exceptions import BackupError, ConfigurationError, ValidationError
 from .types import ConfigFormat, MCPServerConfig
-from .utils import atomic_write, backup_file, parse_json_safe, parse_toml_safe, restore_backup
+from .utils import (
+    atomic_write,
+    backup_file,
+    parse_json_safe,
+    parse_toml_safe,
+    restore_backup,
+)
 
 
 class ConfigManager:
@@ -227,7 +233,9 @@ class ConfigManager:
         config = self.read()
 
         # Determine servers key based on format
-        servers_key = "mcpServers" if self.format == ConfigFormat.JSON else "mcp_servers"
+        servers_key = (
+            "mcpServers" if self.format == ConfigFormat.JSON else "mcp_servers"
+        )
 
         # Initialize servers section if missing
         if servers_key not in config:
@@ -275,7 +283,9 @@ class ConfigManager:
         config = self.read()
 
         # Determine servers key
-        servers_key = "mcpServers" if self.format == ConfigFormat.JSON else "mcp_servers"
+        servers_key = (
+            "mcpServers" if self.format == ConfigFormat.JSON else "mcp_servers"
+        )
 
         # Check if server exists
         if servers_key not in config or name not in config[servers_key]:
@@ -313,7 +323,9 @@ class ConfigManager:
         config = self.read()
 
         # Determine servers key
-        servers_key = "mcpServers" if self.format == ConfigFormat.JSON else "mcp_servers"
+        servers_key = (
+            "mcpServers" if self.format == ConfigFormat.JSON else "mcp_servers"
+        )
 
         # Check if server exists
         if servers_key not in config or name not in config[servers_key]:
@@ -354,7 +366,9 @@ class ConfigManager:
         config = self.read()
 
         # Determine servers key
-        servers_key = "mcpServers" if self.format == ConfigFormat.JSON else "mcp_servers"
+        servers_key = (
+            "mcpServers" if self.format == ConfigFormat.JSON else "mcp_servers"
+        )
 
         servers: list[MCPServerConfig] = []
 
@@ -392,7 +406,9 @@ class ConfigManager:
         config = self.read()
 
         # Determine servers key
-        servers_key = "mcpServers" if self.format == ConfigFormat.JSON else "mcp_servers"
+        servers_key = (
+            "mcpServers" if self.format == ConfigFormat.JSON else "mcp_servers"
+        )
 
         server_dict = config.get(servers_key, {}).get(name)
         if not server_dict or not isinstance(server_dict, dict):
@@ -430,7 +446,9 @@ class ConfigManager:
             return [f"Failed to read config: {e.message}"]
 
         # Determine servers key
-        servers_key = "mcpServers" if self.format == ConfigFormat.JSON else "mcp_servers"
+        servers_key = (
+            "mcpServers" if self.format == ConfigFormat.JSON else "mcp_servers"
+        )
 
         # Check for servers key
         if servers_key not in config:
@@ -450,7 +468,9 @@ class ConfigManager:
 
             # Check required fields
             if "command" not in server_config:
-                issues.append(f"Server '{server_name}' missing required 'command' field")
+                issues.append(
+                    f"Server '{server_name}' missing required 'command' field"
+                )
 
             # Validate field types
             if "args" in server_config and not isinstance(server_config["args"], list):
@@ -493,7 +513,11 @@ class ConfigManager:
             # Check for legacy python module format
             # Old: ["python", "-m", "mcp_ticketer.mcp.server"]
             # New: ["uv", "run", "mcp-ticketer", "mcp"]
-            if len(args) >= 2 and args[0] == "-m" and "mcp_ticketer.mcp.server" in args[1]:
+            if (
+                len(args) >= 2
+                and args[0] == "-m"
+                and "mcp_ticketer.mcp.server" in args[1]
+            ):
                 # Migrate to modern format
                 # Try to detect best command (uv, pipx, or binary)
                 from .utils import resolve_command_path
@@ -502,9 +526,7 @@ class ConfigManager:
                     server_config["command"] = "uv"
                     server_config["args"] = ["run", "mcp-ticketer", "mcp"]
                 elif resolve_command_path("mcp-ticketer"):
-                    server_config["command"] = str(
-                        resolve_command_path("mcp-ticketer")
-                    )
+                    server_config["command"] = str(resolve_command_path("mcp-ticketer"))
                     server_config["args"] = ["mcp"]
                 else:
                     # Keep python fallback but use modern entry point

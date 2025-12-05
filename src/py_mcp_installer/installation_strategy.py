@@ -44,9 +44,7 @@ class InstallationStrategy(ABC):
     """
 
     @abstractmethod
-    def install(
-        self, server: MCPServerConfig, scope: Scope
-    ) -> InstallationResult:
+    def install(self, server: MCPServerConfig, scope: Scope) -> InstallationResult:
         """Install MCP server with this strategy.
 
         Args:
@@ -136,9 +134,7 @@ class NativeCLIStrategy(InstallationStrategy):
         self.platform = platform
         self.cli_command = cli_command
 
-    def install(
-        self, server: MCPServerConfig, scope: Scope
-    ) -> InstallationResult:
+    def install(self, server: MCPServerConfig, scope: Scope) -> InstallationResult:
         """Install server using native CLI.
 
         Executes CLI command to add server. Falls back to JSON strategy
@@ -167,9 +163,7 @@ class NativeCLIStrategy(InstallationStrategy):
 
         try:
             # Execute CLI command
-            result = subprocess.run(
-                cmd, capture_output=True, text=True, timeout=30
-            )
+            result = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
 
             if result.returncode == 0:
                 return InstallationResult(
@@ -206,9 +200,7 @@ class NativeCLIStrategy(InstallationStrategy):
         cmd = self._build_cli_remove_command(name, scope)
 
         try:
-            result = subprocess.run(
-                cmd, capture_output=True, text=True, timeout=30
-            )
+            result = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
 
             if result.returncode == 0:
                 return InstallationResult(
@@ -243,9 +235,7 @@ class NativeCLIStrategy(InstallationStrategy):
             List of server configurations
         """
         # Most CLIs don't support listing, would need config path
-        raise NotImplementedError(
-            "Native CLI list not supported, use JSON strategy"
-        )
+        raise NotImplementedError("Native CLI list not supported, use JSON strategy")
 
     def validate(self) -> bool:
         """Check if CLI command is available.
@@ -260,9 +250,7 @@ class NativeCLIStrategy(InstallationStrategy):
         """
         return resolve_command_path(self.cli_command) is not None
 
-    def _build_cli_command(
-        self, server: MCPServerConfig, scope: Scope
-    ) -> list[str]:
+    def _build_cli_command(self, server: MCPServerConfig, scope: Scope) -> list[str]:
         """Build CLI command for installation.
 
         Args:
@@ -326,9 +314,7 @@ class NativeCLIStrategy(InstallationStrategy):
                 scope_str,
             ]
         else:
-            raise NotImplementedError(
-                f"CLI remove not implemented for {self.platform}"
-            )
+            raise NotImplementedError(f"CLI remove not implemented for {self.platform}")
 
     def _mask_command(self, cmd: list[str]) -> list[str]:
         """Mask sensitive values in command for logging.
@@ -400,9 +386,7 @@ class JSONManipulationStrategy(InstallationStrategy):
         self.config_path = config_path
         self.config_manager = ConfigManager(config_path, ConfigFormat.JSON)
 
-    def install(
-        self, server: MCPServerConfig, scope: Scope
-    ) -> InstallationResult:
+    def install(self, server: MCPServerConfig, scope: Scope) -> InstallationResult:
         """Install server by modifying JSON config.
 
         Args:
@@ -536,9 +520,7 @@ class TOMLManipulationStrategy(InstallationStrategy):
         self.config_path = config_path
         self.config_manager = ConfigManager(config_path, ConfigFormat.TOML)
 
-    def install(
-        self, server: MCPServerConfig, scope: Scope
-    ) -> InstallationResult:
+    def install(self, server: MCPServerConfig, scope: Scope) -> InstallationResult:
         """Install server by modifying TOML config.
 
         Args:

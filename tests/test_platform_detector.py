@@ -1,6 +1,5 @@
 """Tests for platform detector."""
 
-import pytest
 
 from py_mcp_installer.platform_detector import PlatformDetector
 from py_mcp_installer.types import Platform

@@ -20,7 +20,6 @@ from typing import Any
 
 from .exceptions import AtomicWriteError, BackupError, ConfigurationError
 
-
 # ============================================================================
 # File Operations (Atomic & Safe)
 # ============================================================================
@@ -70,9 +69,7 @@ def atomic_write(path: Path, content: str) -> None:
             # Clean up temp file on error
             if os.path.exists(temp_path):
                 os.unlink(temp_path)
-            raise AtomicWriteError(
-                f"Failed to write {path}: {e}", str(path)
-            ) from e
+            raise AtomicWriteError(f"Failed to write {path}: {e}", str(path)) from e
 
     except Exception as e:
         raise AtomicWriteError(f"Failed to create temp file: {e}", str(path)) from e

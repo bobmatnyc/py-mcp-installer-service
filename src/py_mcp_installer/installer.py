@@ -28,7 +28,6 @@ from pathlib import Path
 from typing import Any
 
 from .command_builder import CommandBuilder
-from .config_manager import ConfigManager
 from .exceptions import (
     ConfigurationError,
     InstallationError,
@@ -38,15 +37,14 @@ from .exceptions import (
 )
 from .installation_strategy import (
     InstallationStrategy as BaseStrategy,
+)
+from .installation_strategy import (
     JSONManipulationStrategy,
-    NativeCLIStrategy,
-    TOMLManipulationStrategy,
 )
 from .mcp_inspector import InspectionReport, MCPInspector, ValidationIssue
 from .platform_detector import PlatformDetector
 from .platforms import ClaudeCodeStrategy, CodexStrategy, CursorStrategy
 from .types import (
-    ConfigFormat,
     InstallationResult,
     InstallMethod,
     MCPServerConfig,

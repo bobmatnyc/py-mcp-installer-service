@@ -31,7 +31,7 @@ from typing import Any, Literal
 from .config_manager import ConfigManager
 from .exceptions import ConfigurationError
 from .types import ConfigFormat, MCPServerConfig, Platform, PlatformInfo
-from .utils import parse_json_safe, resolve_command_path
+from .utils import resolve_command_path
 
 logger = logging.getLogger(__name__)
 
@@ -214,7 +214,7 @@ class MCPInspector:
                     message=f"Configuration file not found: {self.config_path}",
                     server_name=None,
                     fix_suggestion=(
-                        f"Create config file or run installer to initialize"
+                        "Create config file or run installer to initialize"
                     ),
                     auto_fixable=True,
                 )
@@ -283,7 +283,7 @@ class MCPInspector:
                     severity="warning",
                     message=f"Duplicate server names detected: {name1}, {name2}",
                     server_name=None,
-                    fix_suggestion=f"Rename one of the servers to avoid conflicts",
+                    fix_suggestion="Rename one of the servers to avoid conflicts",
                     auto_fixable=False,
                 )
             )
@@ -514,7 +514,9 @@ class MCPInspector:
             if name in seen_names:
                 # Find other server with same name
                 for other in servers:
-                    if other.name == name and other.name not in [d[0] for d in duplicates]:
+                    if other.name == name and other.name not in [
+                        d[0] for d in duplicates
+                    ]:
                         duplicates.append((name, name))
                         break
             seen_names.add(name)
@@ -600,9 +602,7 @@ class MCPInspector:
 
         return servers
 
-    def _generate_recommendations(
-        self, servers: list[MCPServerConfig]
-    ) -> list[str]:
+    def _generate_recommendations(self, servers: list[MCPServerConfig]) -> list[str]:
         """Generate general recommendations for improvement.
 
         Args:
@@ -719,10 +719,7 @@ class MCPInspector:
                     clean_args = [
                         arg
                         for arg in server.args
-                        if not any(
-                            dep in arg
-                            for dep in ["--legacy-mode", "--old-api"]
-                        )
+                        if not any(dep in arg for dep in ["--legacy-mode", "--old-api"])
                     ]
 
                     # Update config

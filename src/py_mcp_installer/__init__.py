@@ -31,6 +31,45 @@ Design Principles:
 __version__ = "0.0.3"
 
 # Core types
+from .command_builder import CommandBuilder
+
+# Phase 2 modules
+from .config_manager import ConfigManager
+
+# Exceptions
+from .exceptions import (
+    AtomicWriteError,
+    BackupError,
+    CommandNotFoundError,
+    ConfigurationError,
+    InstallationError,
+    PlatformDetectionError,
+    PlatformNotSupportedError,
+    PyMCPInstallerError,
+    ValidationError,
+)
+from .installation_strategy import (
+    InstallationStrategy as BaseInstallationStrategy,
+)
+from .installation_strategy import (
+    JSONManipulationStrategy,
+    NativeCLIStrategy,
+    TOMLManipulationStrategy,
+)
+from .installer import MCPInstaller
+
+# Phase 3 modules
+from .mcp_inspector import InspectionReport, MCPInspector, ValidationIssue
+
+# Platform detection
+from .platform_detector import PlatformDetector
+
+# Platform-specific implementations
+from .platforms import (
+    ClaudeCodeStrategy,
+    CodexStrategy,
+    CursorStrategy,
+)
 from .types import (
     ArgsList,
     ConfigFormat,
@@ -45,22 +84,6 @@ from .types import (
     Scope,
 )
 
-# Exceptions
-from .exceptions import (
-    AtomicWriteError,
-    BackupError,
-    CommandNotFoundError,
-    ConfigurationError,
-    InstallationError,
-    PlatformDetectionError,
-    PlatformNotSupportedError,
-    PyMCPInstallerError,
-    ValidationError,
-)
-
-# Platform detection
-from .platform_detector import PlatformDetector
-
 # Utilities
 from .utils import (
     atomic_write,
@@ -73,27 +96,6 @@ from .utils import (
     validate_json_structure,
     validate_toml_structure,
 )
-
-# Phase 2 modules
-from .config_manager import ConfigManager
-from .command_builder import CommandBuilder
-from .installation_strategy import (
-    InstallationStrategy as BaseInstallationStrategy,
-    JSONManipulationStrategy,
-    NativeCLIStrategy,
-    TOMLManipulationStrategy,
-)
-
-# Platform-specific implementations
-from .platforms import (
-    ClaudeCodeStrategy,
-    CodexStrategy,
-    CursorStrategy,
-)
-
-# Phase 3 modules
-from .mcp_inspector import InspectionReport, MCPInspector, ValidationIssue
-from .installer import MCPInstaller
 
 __all__ = [
     # Version

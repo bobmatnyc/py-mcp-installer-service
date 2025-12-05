@@ -111,7 +111,9 @@ class CommandBuilder:
         else:
             raise ValueError(f"Unknown install method: {install_method}")
 
-    def build_args(self, server: MCPServerConfig, install_method: InstallMethod) -> list[str]:
+    def build_args(
+        self, server: MCPServerConfig, install_method: InstallMethod
+    ) -> list[str]:
         """Build argument list from server config.
 
         Constructs arguments based on installation method:
@@ -360,9 +362,7 @@ class CommandBuilder:
             description=description,
         )
 
-    def get_platform_command_recommendations(
-        self, package: str
-    ) -> dict[str, Any]:
+    def get_platform_command_recommendations(self, package: str) -> dict[str, Any]:
         """Get platform-specific command recommendations.
 
         Provides information about best practices for command

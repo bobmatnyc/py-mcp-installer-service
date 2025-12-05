@@ -53,9 +53,7 @@ class PlatformDetectionError(PyMCPInstallerError):
         ... )
     """
 
-    def __init__(
-        self, message: str = "No supported AI coding tools detected"
-    ) -> None:
+    def __init__(self, message: str = "No supported AI coding tools detected") -> None:
         """Initialize with default recovery suggestion."""
         super().__init__(
             message,
@@ -239,8 +237,7 @@ class PlatformNotSupportedError(PyMCPInstallerError):
             supported_platforms: List of supported platform names
         """
         message = f"Platform not supported: {platform}"
-        recovery = (
-            "Supported platforms:\n"
-            + "\n".join(f"  - {p}" for p in supported_platforms)
+        recovery = "Supported platforms:\n" + "\n".join(
+            f"  - {p}" for p in supported_platforms
         )
         super().__init__(message, recovery_suggestion=recovery)

@@ -89,10 +89,21 @@ class PlatformDetector:
             raise PlatformDetectionError("No supported platforms detected")
 
         # Map results back to platforms
-        platform_results = list(zip([Platform.CLAUDE_CODE, Platform.CLAUDE_DESKTOP,
-                                     Platform.CURSOR, Platform.AUGGIE, Platform.CODEX,
-                                     Platform.GEMINI_CLI, Platform.WINDSURF,
-                                     Platform.ANTIGRAVITY], results))
+        platform_results = list(
+            zip(
+                [
+                    Platform.CLAUDE_CODE,
+                    Platform.CLAUDE_DESKTOP,
+                    Platform.CURSOR,
+                    Platform.AUGGIE,
+                    Platform.CODEX,
+                    Platform.GEMINI_CLI,
+                    Platform.WINDSURF,
+                    Platform.ANTIGRAVITY,
+                ],
+                results,
+            )
+        )
 
         # Get platform with max confidence
         for platform, (confidence, config_path) in platform_results:
@@ -210,8 +221,11 @@ class PlatformDetector:
         if sys.platform == "darwin":
             # macOS
             config_path = (
-                Path.home() / "Library" / "Application Support" / "Claude" /
-                "claude_desktop_config.json"
+                Path.home()
+                / "Library"
+                / "Application Support"
+                / "Claude"
+                / "claude_desktop_config.json"
             )
         elif sys.platform == "win32":
             # Windows
@@ -220,7 +234,9 @@ class PlatformDetector:
                 config_path = Path(appdata) / "Claude" / "claude_desktop_config.json"
         else:
             # Linux
-            config_path = Path.home() / ".config" / "Claude" / "claude_desktop_config.json"
+            config_path = (
+                Path.home() / ".config" / "Claude" / "claude_desktop_config.json"
+            )
 
         # Check if config exists
         if config_path and config_path.exists():
