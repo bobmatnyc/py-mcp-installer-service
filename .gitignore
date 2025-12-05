@@ -205,3 +205,12 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+
+# Claude MPM memory files
+.claude-mpm/
+.claude-mpm/memories/
+
+# Temporary development documentation
+PHASE*_COMPLETE.md
+*_INTEGRATION.md
+VERIFICATION_CHECKLIST.md
