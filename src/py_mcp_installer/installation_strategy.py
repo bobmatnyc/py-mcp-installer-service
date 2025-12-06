@@ -259,29 +259,31 @@ class NativeCLIStrategy(InstallationStrategy):
         """
         # Platform-specific command building
         if self.platform in (Platform.CLAUDE_CODE, Platform.CLAUDE_DESKTOP):
-            # claude mcp add {name} --command "{command}" --scope {scope}
+            # Claude CLI: claude mcp add [options] <name> -e KEY=val -- <cmd>
+            scope_str = "project" if scope == Scope.PROJECT else "user"
             cmd = [
                 self.cli_command,
                 "mcp",
                 "add",
-                server.name,
-                "--command",
-                server.command,
+                "--scope",
+                scope_str,
+                "--transport",
+                "stdio",
+                server.name,  # Name MUST come before -e flags
             ]
 
-            # Add args
-            if server.args:
-                for arg in server.args:
-                    cmd.extend(["--arg", arg])
-
-            # Add env vars
+            # Add env vars (MUST come after server name)
             if server.env:
                 for key, value in server.env.items():
                     cmd.extend(["-e", f"{key}={value}"])
 
-            # Add scope
-            scope_str = "project" if scope == Scope.PROJECT else "user"
-            cmd.extend(["--scope", scope_str])
+            # Command separator and server command
+            cmd.append("--")
+            cmd.append(server.command)
+
+            # Add args after the command
+            if server.args:
+                cmd.extend(server.args)
 
             return cmd
 
