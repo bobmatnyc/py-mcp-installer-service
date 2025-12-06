@@ -277,7 +277,7 @@ class NativeCLIStrategy(InstallationStrategy):
             # Add env vars
             if server.env:
                 for key, value in server.env.items():
-                    cmd.extend(["--env", f"{key}={value}"])
+                    cmd.extend(["-e", f"{key}={value}"])
 
             # Add scope
             scope_str = "project" if scope == Scope.PROJECT else "user"
@@ -335,7 +335,7 @@ class NativeCLIStrategy(InstallationStrategy):
                 else:
                     masked.append("***")
                 mask_next = False
-            elif part == "--env":
+            elif part == "-e":
                 masked.append(part)
                 mask_next = True
             else:
