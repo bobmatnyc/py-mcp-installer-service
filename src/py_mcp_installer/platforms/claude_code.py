@@ -10,6 +10,8 @@ Claude Code supports:
 - JSON manipulation fallback
 """
 
+from __future__ import annotations
+
 from pathlib import Path
 
 from ..command_builder import CommandBuilder

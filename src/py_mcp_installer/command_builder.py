@@ -16,6 +16,8 @@ Priority:
 4. PYTHON_MODULE: python -m mcp_ticketer mcp (fallback)
 """
 
+from __future__ import annotations
+
 from pathlib import Path
 from typing import Any
 

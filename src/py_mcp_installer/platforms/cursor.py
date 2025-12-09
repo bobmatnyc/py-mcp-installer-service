@@ -9,6 +9,8 @@ Cursor supports:
 - JSON manipulation only (no native CLI for MCP)
 """
 
+from __future__ import annotations
+
 from pathlib import Path
 
 from ..command_builder import CommandBuilder

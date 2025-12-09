@@ -11,6 +11,8 @@ Design Philosophy:
 - Clear separation between public API and internal types
 """
 
+from __future__ import annotations
+
 from dataclasses import dataclass, field
 from enum import Enum
 from pathlib import Path

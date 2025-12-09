@@ -9,6 +9,8 @@ Codex supports:
 - TOML manipulation strategy
 """
 
+from __future__ import annotations
+
 from pathlib import Path
 
 from ..command_builder import CommandBuilder
