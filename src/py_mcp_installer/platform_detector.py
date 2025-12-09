@@ -132,6 +132,64 @@ class PlatformDetector:
             scope_support=Scope.BOTH,
         )
 
+    def detect_for_platform(self, platform: Platform) -> PlatformInfo:
+        """Detect info for a specific platform.
+
+        Instead of returning the highest confidence platform, this returns
+        detection info specifically for the requested platform.
+
+        Args:
+            platform: The specific platform to detect
+
+        Returns:
+            PlatformInfo for the specified platform
+
+        Raises:
+            PlatformDetectionError: If the specified platform is not available
+
+        Example:
+            >>> detector = PlatformDetector()
+            >>> info = detector.detect_for_platform(Platform.CLAUDE_CODE)
+            >>> print(f"Claude Code available: {info.confidence > 0}")
+        """
+        # Map platform to detector method
+        detector_map = {
+            Platform.CLAUDE_CODE: self.detect_claude_code,
+            Platform.CLAUDE_DESKTOP: self.detect_claude_desktop,
+            Platform.CURSOR: self.detect_cursor,
+            Platform.AUGGIE: self.detect_auggie,
+            Platform.CODEX: self.detect_codex,
+            Platform.GEMINI_CLI: self.detect_gemini_cli,
+            Platform.WINDSURF: self.detect_windsurf,
+            Platform.ANTIGRAVITY: self.detect_antigravity,
+        }
+
+        detector_func = detector_map.get(platform)
+        if not detector_func:
+            raise PlatformDetectionError(f"Unknown platform: {platform}")
+
+        confidence, config_path = detector_func()
+
+        if confidence == 0.0:
+            raise PlatformDetectionError(
+                f"Platform {platform.value} is not available on this system"
+            )
+
+        # Determine CLI availability
+        cli_available = False
+        if platform in (Platform.CLAUDE_CODE, Platform.CLAUDE_DESKTOP):
+            cli_available = resolve_command_path("claude") is not None
+        elif platform == Platform.CURSOR:
+            cli_available = resolve_command_path("cursor") is not None
+
+        return PlatformInfo(
+            platform=platform,
+            confidence=confidence,
+            config_path=config_path,
+            cli_available=cli_available,
+            scope_support=Scope.BOTH,
+        )
+
     # ========================================================================
     # Platform-Specific Detectors
     # ========================================================================

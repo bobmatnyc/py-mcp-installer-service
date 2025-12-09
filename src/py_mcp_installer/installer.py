@@ -135,15 +135,15 @@ class MCPInstaller:
 
         # Detect or use provided platform
         if platform:
-            # For forced platform, we still need to detect but validate it matches
+            # For forced platform, detect info specifically for that platform
             detector = PlatformDetector()
-            detected_info = detector.detect()
-            if detected_info.platform != platform:
+            try:
+                self._platform_info = detector.detect_for_platform(platform)
+            except PlatformDetectionError as e:
                 raise PlatformNotSupportedError(
                     platform.value,
                     [p.value for p in Platform if p != Platform.UNKNOWN],
-                )
-            self._platform_info = detected_info
+                ) from e
         else:
             self._platform_info = self._detect_platform()
 
