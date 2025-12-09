@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [0.0.4] - 2025-12-09
+## [0.1.4] - 2025-12-09
 
 ### Fixed
 - Added missing `tomli-w` dependency for TOML config writing (Codex platform)
@@ -34,6 +34,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Dry-run mode
 - Comprehensive error handling
 
-[Unreleased]: https://github.com/bobmatnyc/py-mcp-installer-service/compare/v0.0.4...HEAD
-[0.0.4]: https://github.com/bobmatnyc/py-mcp-installer-service/compare/v0.0.3...v0.0.4
+[Unreleased]: https://github.com/bobmatnyc/py-mcp-installer-service/compare/v0.1.4...HEAD
+[0.1.4]: https://github.com/bobmatnyc/py-mcp-installer-service/compare/v0.0.3...v0.1.4
 [0.0.3]: https://github.com/bobmatnyc/py-mcp-installer-service/releases/tag/v0.0.3
