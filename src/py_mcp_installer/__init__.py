@@ -28,7 +28,7 @@ Design Principles:
     - Clear error messages with recovery suggestions
 """
 
-__version__ = "0.0.3"
+__version__ = "0.0.4"
 
 # Core types
 from .command_builder import CommandBuilder
