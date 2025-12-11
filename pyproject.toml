@@ -52,6 +52,9 @@ Documentation = "https://github.com/bobmatnyc/py-mcp-installer-service/tree/main
 Repository = "https://github.com/bobmatnyc/py-mcp-installer-service"
 Issues = "https://github.com/bobmatnyc/py-mcp-installer-service/issues"
 
+[project.scripts]
+py-mcp-installer = "py_mcp_installer.cli:main"
+
 [tool.setuptools.packages.find]
 where = ["src"]
 

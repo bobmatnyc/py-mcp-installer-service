@@ -61,6 +61,9 @@ from .installer import MCPInstaller
 # Phase 3 modules
 from .mcp_inspector import InspectionReport, MCPInspector, ValidationIssue
 
+# Phase 4 modules (Doctor/Diagnostics)
+from .mcp_doctor import DiagnosticIssue, DiagnosticReport, MCPDoctor, ServerDiagnostic
+
 # Platform detection
 from .platform_detector import PlatformDetector
 
@@ -73,6 +76,8 @@ from .platforms import (
 from .types import (
     ArgsList,
     ConfigFormat,
+    DiagnosticCategory,
+    DiagnosticStatus,
     EnvDict,
     InstallationResult,
     InstallationStrategy,
@@ -82,6 +87,7 @@ from .types import (
     Platform,
     PlatformInfo,
     Scope,
+    ServerStatus,
 )
 
 # Utilities
@@ -112,6 +118,10 @@ __all__ = [
     "JsonDict",
     "EnvDict",
     "ArgsList",
+    # Diagnostic Types
+    "DiagnosticCategory",
+    "DiagnosticStatus",
+    "ServerStatus",
     # Exceptions
     "PyMCPInstallerError",
     "PlatformDetectionError",
@@ -150,4 +160,9 @@ __all__ = [
     "MCPInspector",
     "ValidationIssue",
     "InspectionReport",
+    # Phase 4 modules (Doctor/Diagnostics)
+    "MCPDoctor",
+    "DiagnosticIssue",
+    "DiagnosticReport",
+    "ServerDiagnostic",
 ]
