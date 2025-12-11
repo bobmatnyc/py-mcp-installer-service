@@ -91,6 +91,53 @@ class InstallationStrategy(str, Enum):
     TOML_MANIPULATION = "toml_manipulation"
 
 
+class DiagnosticCategory(str, Enum):
+    """Categories for diagnostic checks.
+
+    Used by MCPDoctor to classify different types of diagnostic issues.
+
+    - CONFIG: Configuration file issues (missing, invalid, corrupted)
+    - SERVER: MCP server connectivity/protocol issues
+    - COMMAND: Command availability issues (not in PATH)
+    - ENVIRONMENT: Environment variable issues (missing, placeholder)
+    - PLATFORM: Platform detection issues
+    """
+
+    CONFIG = "config"
+    SERVER = "server"
+    COMMAND = "command"
+    ENVIRONMENT = "environment"
+    PLATFORM = "platform"
+
+
+class DiagnosticStatus(str, Enum):
+    """Overall status of diagnostic report.
+
+    - HEALTHY: All checks passed, no critical issues
+    - DEGRADED: Some warnings but servers functional
+    - CRITICAL: Critical issues preventing server operation
+    """
+
+    HEALTHY = "healthy"
+    DEGRADED = "degraded"
+    CRITICAL = "critical"
+
+
+class ServerStatus(str, Enum):
+    """Status of individual MCP server diagnostic.
+
+    - HEALTHY: Server responds correctly to JSON-RPC
+    - UNREACHABLE: Cannot connect to server (timeout, command not found)
+    - ERROR: Server responded with error
+    - UNKNOWN: Server not tested (quick mode)
+    """
+
+    HEALTHY = "healthy"
+    UNREACHABLE = "unreachable"
+    ERROR = "error"
+    UNKNOWN = "unknown"
+
+
 # ============================================================================
 # Dataclasses
 # ============================================================================

@@ -41,6 +41,7 @@ from .installation_strategy import (
 from .installation_strategy import (
     JSONManipulationStrategy,
 )
+from .mcp_doctor import DiagnosticReport, MCPDoctor
 from .mcp_inspector import InspectionReport, MCPInspector, ValidationIssue
 from .platform_detector import PlatformDetector
 from .platforms import ClaudeCodeStrategy, CodexStrategy, CursorStrategy
@@ -457,6 +458,72 @@ class MCPInstaller:
                     print(f"  - {rec}")
             print()
 
+        return report
+
+    def run_diagnostics(self, full: bool = False) -> DiagnosticReport:
+        """Run comprehensive diagnostics on MCP installation.
+
+        Performs diagnostic checks on platform detection, configuration,
+        commands, environment variables, and optionally tests MCP server
+        protocol compliance.
+
+        Args:
+            full: If True, also test server JSON-RPC protocol compliance.
+                  This is slower but provides complete server health status.
+
+        Returns:
+            DiagnosticReport with all issues, server status, and recommendations
+
+        Example:
+            >>> # Quick diagnostics (config/command checks only)
+            >>> report = installer.run_diagnostics()
+            >>> print(f"Status: {report.status.value}")
+            >>> print(f"Checks: {report.checks_passed}/{report.checks_total}")
+
+            >>> # Full diagnostics with server tests
+            >>> report = installer.run_diagnostics(full=True)
+            >>> for name, diag in report.server_reports.items():
+            ...     print(f"{name}: {diag.status.value}")
+            ...     if diag.status.value == "healthy":
+            ...         print(f"  Tools: {diag.tool_count}")
+        """
+        logger.info(f"Running diagnostics (full={full})...")
+        doctor = MCPDoctor(
+            self._platform_info,
+            timeout=10.0,
+            verbose=self.verbose,
+        )
+        report = doctor.diagnose(full=full)
+
+        if self.verbose:
+            print("\n" + "=" * 50)
+            print("MCP Installation Diagnostics")
+            print("=" * 50)
+            print(f"Platform: {report.platform.value}")
+            print(f"Status: {report.status.value.upper()}")
+            print(f"Checks: {report.checks_passed}/{report.checks_total} passed")
+
+            if report.issues:
+                print("\nIssues:")
+                for issue in report.issues:
+                    print(f"  [{issue.severity.upper()}] {issue.message}")
+
+            if report.server_reports:
+                print("\nServer Status:")
+                for name, diag in report.server_reports.items():
+                    status = diag.status.value.upper()
+                    if diag.status.value == "healthy":
+                        print(f"  {name}: {status} (tools: {diag.tool_count})")
+                    else:
+                        print(f"  {name}: {status}")
+
+            if report.recommendations:
+                print("\nRecommendations:")
+                for rec in report.recommendations:
+                    print(f"  - {rec}")
+            print()
+
+        logger.info(f"Diagnostics complete: {report.status.value}")
         return report
 
     def fix_issues(self, auto_fix: bool = True) -> list[str]:
