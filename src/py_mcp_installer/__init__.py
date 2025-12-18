@@ -58,11 +58,11 @@ from .installation_strategy import (
 )
 from .installer import MCPInstaller
 
-# Phase 3 modules
-from .mcp_inspector import InspectionReport, MCPInspector, ValidationIssue
-
 # Phase 4 modules (Doctor/Diagnostics)
 from .mcp_doctor import DiagnosticIssue, DiagnosticReport, MCPDoctor, ServerDiagnostic
+
+# Phase 3 modules
+from .mcp_inspector import InspectionReport, MCPInspector, ValidationIssue
 
 # Platform detection
 from .platform_detector import PlatformDetector

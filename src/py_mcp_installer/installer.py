@@ -163,7 +163,7 @@ class MCPInstaller:
         self._strategy = self._select_strategy()
 
     @classmethod
-    def auto_detect(cls, **kwargs: Any) -> "MCPInstaller":
+    def auto_detect(cls, **kwargs: Any) -> MCPInstaller:
         """Create installer with auto-detected platform.
 
         This is the recommended way to create an installer instance.
@@ -189,6 +189,7 @@ class MCPInstaller:
         description: str = "",
         scope: Scope = Scope.PROJECT,
         method: InstallMethod | None = None,
+        force: bool = False,
     ) -> InstallationResult:
         """Install MCP server.
 
@@ -203,6 +204,7 @@ class MCPInstaller:
             description: Human-readable description
             scope: Installation scope (PROJECT or GLOBAL)
             method: Installation method (auto-detect if None)
+            force: If True, update existing server instead of raising error
 
         Returns:
             InstallationResult with success status and details
@@ -312,9 +314,29 @@ class MCPInstaller:
             )
 
         try:
-            result = self._strategy.install(server, scope)
-            logger.info(f"Successfully installed {name}")
-            return result
+            # Check if server already exists
+            existing_server = self.get_server(name, scope)
+
+            if existing_server and force:
+                # Force mode: update existing server
+                logger.info(f"Server '{name}' already exists, updating (force=True)")
+                result = self._strategy.update(server, scope)
+                logger.info(f"Successfully updated {name}")
+                return result
+            elif existing_server:
+                # Server exists but force=False, raise error
+                raise InstallationError(
+                    f"Server '{name}' already exists",
+                    "Use force=True to update existing server or uninstall first",
+                )
+            else:
+                # Server doesn't exist, install normally
+                result = self._strategy.install(server, scope)
+                logger.info(f"Successfully installed {name}")
+                return result
+        except InstallationError:
+            # Re-raise InstallationError as-is
+            raise
         except Exception as e:
             logger.error(f"Installation failed: {e}", exc_info=True)
             raise InstallationError(

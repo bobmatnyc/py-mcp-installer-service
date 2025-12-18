@@ -78,6 +78,22 @@ class InstallationStrategy(ABC):
         pass
 
     @abstractmethod
+    def update(self, server: MCPServerConfig, scope: Scope) -> InstallationResult:
+        """Update existing MCP server configuration.
+
+        Args:
+            server: Updated server configuration
+            scope: Installation scope
+
+        Returns:
+            InstallationResult with status
+
+        Raises:
+            InstallationError: If update fails or server doesn't exist
+        """
+        pass
+
+    @abstractmethod
     def list_servers(self, scope: Scope) -> list[MCPServerConfig]:
         """List installed servers.
 
@@ -218,6 +234,29 @@ class NativeCLIStrategy(InstallationStrategy):
         except (subprocess.TimeoutExpired, FileNotFoundError) as e:
             raise InstallationError(
                 f"CLI uninstall failed: {e}",
+                recovery_suggestion="Try JSON manipulation strategy",
+            ) from e
+
+    def update(self, server: MCPServerConfig, scope: Scope) -> InstallationResult:
+        """Update server using native CLI.
+
+        Note: Most CLIs don't have update command, so we uninstall then install.
+
+        Args:
+            server: Updated server configuration
+            scope: Installation scope
+
+        Returns:
+            InstallationResult with update status
+        """
+        try:
+            # Uninstall existing
+            self.uninstall(server.name, scope)
+            # Install with new config
+            return self.install(server, scope)
+        except InstallationError as e:
+            raise InstallationError(
+                f"CLI update failed: {e}",
                 recovery_suggestion="Try JSON manipulation strategy",
             ) from e
 
@@ -458,6 +497,47 @@ class JSONManipulationStrategy(InstallationStrategy):
                 recovery_suggestion="Check config file permissions",
             ) from e
 
+    def update(self, server: MCPServerConfig, scope: Scope) -> InstallationResult:
+        """Update server by modifying JSON config.
+
+        Args:
+            server: Updated server configuration
+            scope: Installation scope (unused for JSON, config_path determines scope)
+
+        Returns:
+            InstallationResult with update status
+
+        Raises:
+            InstallationError: If update fails
+        """
+        try:
+            # Create backup before update
+            self.config_manager.backup()
+
+            # Update server using config manager
+            self.config_manager.update_server(server.name, server)
+
+            return InstallationResult(
+                success=True,
+                platform=self.platform,
+                server_name=server.name,
+                method=InstallMethod.DIRECT,
+                message=f"Successfully updated '{server.name}' in {self.config_path}",
+                config_path=self.config_path,
+            )
+
+        except ValidationError as e:
+            # Server doesn't exist
+            raise InstallationError(
+                f"Server '{server.name}' not found",
+                recovery_suggestion="Use install operation for new servers",
+            ) from e
+        except Exception as e:
+            raise InstallationError(
+                f"Failed to update server: {e}",
+                recovery_suggestion="Check config file permissions and syntax",
+            ) from e
+
     def list_servers(self, scope: Scope) -> list[MCPServerConfig]:
         """List servers from JSON config.
 
@@ -585,6 +665,47 @@ class TOMLManipulationStrategy(InstallationStrategy):
             raise InstallationError(
                 f"Failed to uninstall server: {e}",
                 recovery_suggestion="Check TOML file permissions",
+            ) from e
+
+    def update(self, server: MCPServerConfig, scope: Scope) -> InstallationResult:
+        """Update server by modifying TOML config.
+
+        Args:
+            server: Updated server configuration
+            scope: Installation scope (unused)
+
+        Returns:
+            InstallationResult with update status
+
+        Raises:
+            InstallationError: If update fails
+        """
+        try:
+            # Create backup before update
+            self.config_manager.backup()
+
+            # Update server using config manager
+            self.config_manager.update_server(server.name, server)
+
+            return InstallationResult(
+                success=True,
+                platform=self.platform,
+                server_name=server.name,
+                method=InstallMethod.DIRECT,
+                message=f"Successfully updated '{server.name}' in {self.config_path}",
+                config_path=self.config_path,
+            )
+
+        except ValidationError as e:
+            # Server doesn't exist
+            raise InstallationError(
+                f"Server '{server.name}' not found",
+                recovery_suggestion="Use install operation for new servers",
+            ) from e
+        except Exception as e:
+            raise InstallationError(
+                f"Failed to update server: {e}",
+                recovery_suggestion="Check TOML file permissions and syntax",
             ) from e
 
     def list_servers(self, scope: Scope) -> list[MCPServerConfig]:

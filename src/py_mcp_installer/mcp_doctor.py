@@ -638,16 +638,16 @@ class MCPDoctor:
                         category=DiagnosticCategory.ENVIRONMENT,
                         severity="warning",
                         check_name="env_empty",
-                        message=(
-                            f"Server '{server.name}' has empty env var: {key}"
-                        ),
+                        message=(f"Server '{server.name}' has empty env var: {key}"),
                         server_name=server.name,
                         fix_suggestion=f"Set a value for {key} or remove it",
                         details={"env_key": key},
                     )
                 )
 
-        logger.debug(f"Environment checks for {server.name}: {len(issues)} issues found")
+        logger.debug(
+            f"Environment checks for {server.name}: {len(issues)} issues found"
+        )
         return issues
 
     def test_server(self, server: MCPServerConfig) -> ServerDiagnostic:
@@ -892,7 +892,9 @@ class MCPDoctor:
             )
 
             if "error" in response:
-                return False, {"error": response["error"].get("message", "Unknown error")}
+                return False, {
+                    "error": response["error"].get("message", "Unknown error")
+                }
 
             return True, response.get("result", {})
 
@@ -1040,7 +1042,6 @@ class MCPDoctor:
 
         # Count issues by category
         critical_count = sum(1 for i in issues if i.severity == "critical")
-        warning_count = sum(1 for i in issues if i.severity == "warning")
 
         # Add recommendations based on issues
         if critical_count > 0:
@@ -1049,18 +1050,14 @@ class MCPDoctor:
             )
 
         # Check for missing commands
-        missing_commands = [
-            i for i in issues if i.check_name == "command_exists"
-        ]
+        missing_commands = [i for i in issues if i.check_name == "command_exists"]
         if missing_commands:
             recommendations.append(
                 f"Install {len(missing_commands)} missing command(s)"
             )
 
         # Check for env placeholders
-        placeholder_issues = [
-            i for i in issues if i.check_name == "env_placeholder"
-        ]
+        placeholder_issues = [i for i in issues if i.check_name == "env_placeholder"]
         if placeholder_issues:
             recommendations.append(
                 f"Configure {len(placeholder_issues)} environment variable(s)"

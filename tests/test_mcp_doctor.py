@@ -5,7 +5,7 @@ import subprocess
 from datetime import datetime
 from pathlib import Path
 from typing import Any
-from unittest.mock import MagicMock, Mock, patch
+from unittest.mock import MagicMock, patch
 
 import pytest
 
@@ -24,7 +24,6 @@ from py_mcp_installer.types import (
     Scope,
     ServerStatus,
 )
-
 
 # ============================================================================
 # Fixtures
@@ -404,7 +403,9 @@ class TestMCPDoctor:
         detection_issues = [i for i in critical if "detect" in i.message.lower()]
         assert len(detection_issues) >= 1
 
-    def test_check_platform_low_confidence(self, mock_platform_info: PlatformInfo) -> None:
+    def test_check_platform_low_confidence(
+        self, mock_platform_info: PlatformInfo
+    ) -> None:
         """Test platform check with low confidence."""
         info = PlatformInfo(
             platform=Platform.CLAUDE_CODE,
@@ -420,7 +421,9 @@ class TestMCPDoctor:
         assert len(warnings) >= 1
         assert any("confidence" in i.message.lower() for i in warnings)
 
-    def test_check_platform_no_config_path(self, mock_platform_info: PlatformInfo) -> None:
+    def test_check_platform_no_config_path(
+        self, mock_platform_info: PlatformInfo
+    ) -> None:
         """Test platform check with no config path."""
         info = PlatformInfo(
             platform=Platform.CLAUDE_CODE,
@@ -454,7 +457,10 @@ class TestMCPDoctor:
 
     @patch("py_mcp_installer.mcp_doctor.ConfigManager")
     def test_check_config_valid_with_servers(
-        self, mock_config_manager: MagicMock, doctor: MCPDoctor, mock_config_content: dict[str, Any]
+        self,
+        mock_config_manager: MagicMock,
+        doctor: MCPDoctor,
+        mock_config_content: dict[str, Any],
     ) -> None:
         """Test config check with valid config containing servers."""
         mock_manager = MagicMock()
@@ -602,7 +608,10 @@ class TestMCPDoctor:
         mock_manager.read.return_value = mock_config_content
         doctor.config_manager = mock_manager
 
-        with patch("py_mcp_installer.mcp_doctor.resolve_command_path", return_value="/usr/bin/uv"):
+        with patch(
+            "py_mcp_installer.mcp_doctor.resolve_command_path",
+            return_value="/usr/bin/uv",
+        ):
             report = doctor.diagnose(full=False)
 
         assert isinstance(report, DiagnosticReport)
@@ -656,37 +665,57 @@ class TestServerProtocolTests:
         mock_process.returncode = None
 
         # Mock JSON-RPC responses
-        init_response = json.dumps({
-            "jsonrpc": "2.0",
-            "id": 1,
-            "result": {
-                "protocolVersion": "2024-11-05",
-                "capabilities": {
-                    "tools": {},
-                    "resources": {},
-                    "prompts": {},
-                },
-                "serverInfo": {"name": "test", "version": "1.0"},
-            },
-        }) + "\n"
+        init_response = (
+            json.dumps(
+                {
+                    "jsonrpc": "2.0",
+                    "id": 1,
+                    "result": {
+                        "protocolVersion": "2024-11-05",
+                        "capabilities": {
+                            "tools": {},
+                            "resources": {},
+                            "prompts": {},
+                        },
+                        "serverInfo": {"name": "test", "version": "1.0"},
+                    },
+                }
+            )
+            + "\n"
+        )
 
-        tools_response = json.dumps({
-            "jsonrpc": "2.0",
-            "id": 2,
-            "result": {"tools": [{"name": "tool1"}, {"name": "tool2"}]},
-        }) + "\n"
+        tools_response = (
+            json.dumps(
+                {
+                    "jsonrpc": "2.0",
+                    "id": 2,
+                    "result": {"tools": [{"name": "tool1"}, {"name": "tool2"}]},
+                }
+            )
+            + "\n"
+        )
 
-        resources_response = json.dumps({
-            "jsonrpc": "2.0",
-            "id": 3,
-            "result": {"resources": []},
-        }) + "\n"
+        resources_response = (
+            json.dumps(
+                {
+                    "jsonrpc": "2.0",
+                    "id": 3,
+                    "result": {"resources": []},
+                }
+            )
+            + "\n"
+        )
 
-        prompts_response = json.dumps({
-            "jsonrpc": "2.0",
-            "id": 4,
-            "result": {"prompts": []},
-        }) + "\n"
+        prompts_response = (
+            json.dumps(
+                {
+                    "jsonrpc": "2.0",
+                    "id": 4,
+                    "result": {"prompts": []},
+                }
+            )
+            + "\n"
+        )
 
         # Set up mock readline to return responses in sequence
         mock_process.stdout.readline.side_effect = [
@@ -752,7 +781,8 @@ class TestServerProtocolTests:
         diag = doctor.test_server(server)
 
         assert diag.status == ServerStatus.UNREACHABLE
-        assert "timeout" in (diag.error or "").lower() or "not respond" in (diag.error or "").lower()
+        error_lower = (diag.error or "").lower()
+        assert "timeout" in error_lower or "not respond" in error_lower
 
     @patch("subprocess.Popen")
     @patch("py_mcp_installer.mcp_doctor.resolve_command_path")
@@ -766,11 +796,16 @@ class TestServerProtocolTests:
         mock_process = MagicMock()
 
         # Mock error response
-        error_response = json.dumps({
-            "jsonrpc": "2.0",
-            "id": 1,
-            "error": {"code": -32600, "message": "Invalid request"},
-        }) + "\n"
+        error_response = (
+            json.dumps(
+                {
+                    "jsonrpc": "2.0",
+                    "id": 1,
+                    "error": {"code": -32600, "message": "Invalid request"},
+                }
+            )
+            + "\n"
+        )
 
         mock_process.stdout.readline.return_value = error_response
         mock_process.stdin = MagicMock()

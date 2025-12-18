@@ -31,7 +31,7 @@ from . import __version__
 from .exceptions import PlatformDetectionError
 from .mcp_doctor import DiagnosticIssue, DiagnosticReport, MCPDoctor
 from .platform_detector import PlatformDetector
-from .types import DiagnosticStatus, ServerStatus
+from .types import DiagnosticStatus, ServerDiagnostic, ServerStatus
 
 
 def main() -> NoReturn:
@@ -155,11 +155,14 @@ def cmd_doctor(args: argparse.Namespace) -> int:
             print(f"\n{_color('red', 'ERROR')}: {e}")
             if args.verbose:
                 import traceback
+
                 traceback.print_exc()
         return 2
 
 
-def _filter_report_by_server(report: DiagnosticReport, server_name: str) -> DiagnosticReport:
+def _filter_report_by_server(
+    report: DiagnosticReport, server_name: str
+) -> DiagnosticReport:
     """Filter report to only include issues for specific server.
 
     Args:
@@ -172,12 +175,14 @@ def _filter_report_by_server(report: DiagnosticReport, server_name: str) -> Diag
     from dataclasses import replace
 
     filtered_issues = [
-        issue for issue in report.issues
+        issue
+        for issue in report.issues
         if issue.server_name == server_name or issue.server_name is None
     ]
 
     filtered_server_reports = {
-        name: diag for name, diag in report.server_reports.items()
+        name: diag
+        for name, diag in report.server_reports.items()
         if name == server_name
     }
 
@@ -287,7 +292,6 @@ def _print_server_status(diag: "ServerDiagnostic") -> None:
     Args:
         diag: Server diagnostic to print
     """
-    from .mcp_doctor import ServerDiagnostic  # noqa: F811
 
     status_colors = {
         ServerStatus.HEALTHY: "green",
