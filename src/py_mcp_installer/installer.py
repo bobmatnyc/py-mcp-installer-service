@@ -25,6 +25,7 @@ Example:
 
 from __future__ import annotations
 
+import json
 import logging
 from pathlib import Path
 from typing import Any
@@ -159,8 +160,8 @@ class MCPInstaller:
         self._command_builder = CommandBuilder(self._platform_info.platform)
         self._inspector = MCPInspector(self._platform_info)
 
-        # Select installation strategy
-        self._strategy = self._select_strategy()
+        # Select installation strategy and platform strategy
+        self._strategy, self._platform_strategy = self._select_strategy()
 
     @classmethod
     def auto_detect(cls, **kwargs: Any) -> MCPInstaller:
@@ -409,6 +410,51 @@ class MCPInstaller:
         """
         try:
             return self._strategy.list_servers(scope)
+        except NotImplementedError as e:
+            # Strategy doesn't support list_servers (e.g., NativeCLIStrategy)
+            # Fallback to reading JSON config directly
+            logger.debug(f"Strategy does not support list_servers, falling back to JSON: {e}")
+
+            try:
+                # Get config path from platform strategy
+                if self._platform_strategy is None:
+                    logger.warning("No platform strategy available for fallback")
+                    return []
+
+                config_path = self._platform_strategy.get_config_path(scope)
+
+                if not config_path.exists():
+                    logger.debug(f"Config file does not exist: {config_path}")
+                    return []
+
+                # Read and parse JSON file
+                with open(config_path, 'r') as f:
+                    config = json.load(f)
+
+                # Extract mcpServers section
+                mcp_servers = config.get("mcpServers", {})
+
+                # Convert to MCPServerConfig objects
+                servers: list[MCPServerConfig] = []
+                for name, server_dict in mcp_servers.items():
+                    if not isinstance(server_dict, dict):
+                        continue  # Skip invalid entries
+
+                    servers.append(
+                        MCPServerConfig(
+                            name=name,
+                            command=server_dict.get("command", ""),
+                            args=server_dict.get("args", []),
+                            env=server_dict.get("env", {}),
+                            description=server_dict.get("description", ""),
+                        )
+                    )
+
+                return servers
+
+            except Exception as json_error:
+                logger.warning(f"Failed to read JSON config: {json_error}")
+                return []
         except Exception as e:
             logger.error(f"Failed to list servers: {e}", exc_info=True)
             return []
@@ -693,11 +739,12 @@ class MCPInstaller:
 
         return info
 
-    def _select_strategy(self) -> BaseStrategy:
+    def _select_strategy(self) -> tuple[BaseStrategy, Any]:
         """Select best installation strategy for platform.
 
         Returns:
-            Installation strategy instance
+            Tuple of (installation_strategy, platform_strategy)
+            platform_strategy is None for platforms without a strategy class
 
         Raises:
             PlatformNotSupportedError: If platform has no strategy
@@ -708,20 +755,20 @@ class MCPInstaller:
         if platform == Platform.CLAUDE_CODE:
             claude_strategy = ClaudeCodeStrategy()
             # Use the strategy's get_strategy method to get actual installer
-            return claude_strategy.get_strategy(Scope.PROJECT)
+            return (claude_strategy.get_strategy(Scope.PROJECT), claude_strategy)
 
         elif platform == Platform.CLAUDE_DESKTOP:
             # Use same strategy as Claude Code
             desktop_strategy = ClaudeCodeStrategy()
-            return desktop_strategy.get_strategy(Scope.GLOBAL)
+            return (desktop_strategy.get_strategy(Scope.GLOBAL), desktop_strategy)
 
         elif platform == Platform.CURSOR:
             cursor_strategy = CursorStrategy()
-            return cursor_strategy.get_strategy(Scope.PROJECT)
+            return (cursor_strategy.get_strategy(Scope.PROJECT), cursor_strategy)
 
         elif platform == Platform.CODEX:
             codex_strategy = CodexStrategy()
-            return codex_strategy.get_strategy(Scope.GLOBAL)
+            return (codex_strategy.get_strategy(Scope.GLOBAL), codex_strategy)
 
         elif platform in [Platform.AUGGIE, Platform.WINDSURF, Platform.GEMINI_CLI]:
             # Generic JSON manipulation for these platforms
@@ -731,10 +778,11 @@ class MCPInstaller:
                     "Ensure platform is installed correctly",
                 )
 
-            return JSONManipulationStrategy(
+            strategy = JSONManipulationStrategy(
                 platform=platform,
                 config_path=self._platform_info.config_path,
             )
+            return (strategy, None)
 
         else:
             raise PlatformNotSupportedError(
