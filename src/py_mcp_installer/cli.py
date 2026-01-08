@@ -29,9 +29,9 @@ from typing import Any, NoReturn
 
 from . import __version__
 from .exceptions import PlatformDetectionError
-from .mcp_doctor import DiagnosticIssue, DiagnosticReport, MCPDoctor
+from .mcp_doctor import DiagnosticIssue, DiagnosticReport, MCPDoctor, ServerDiagnostic
 from .platform_detector import PlatformDetector
-from .types import DiagnosticStatus, ServerDiagnostic, ServerStatus
+from .types import DiagnosticStatus, ServerStatus
 
 
 def main() -> NoReturn:
