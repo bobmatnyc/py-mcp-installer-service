@@ -1,12 +1,12 @@
 """Tests for platform detector."""
 
-import pytest
-from unittest.mock import patch, MagicMock
 from pathlib import Path
 
+import pytest
+
+from py_mcp_installer.exceptions import PlatformDetectionError
 from py_mcp_installer.platform_detector import PlatformDetector, PlatformInfo
 from py_mcp_installer.types import Platform
-from py_mcp_installer.exceptions import PlatformDetectionError
 
 
 def test_detect_returns_platform_info_or_raises():
