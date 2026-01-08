@@ -90,6 +90,13 @@ from .types import (
     ServerStatus,
 )
 
+# Self-updater
+from .self_updater import (
+    InstallMethod as SelfUpdateInstallMethod,
+    SelfUpdater,
+    UpdateCheckResult,
+)
+
 # Utilities
 from .utils import (
     atomic_write,
@@ -165,4 +172,8 @@ __all__ = [
     "DiagnosticIssue",
     "DiagnosticReport",
     "ServerDiagnostic",
+    # Self-updater
+    "SelfUpdater",
+    "SelfUpdateInstallMethod",
+    "UpdateCheckResult",
 ]

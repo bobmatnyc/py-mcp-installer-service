@@ -25,7 +25,7 @@ Example:
 import argparse
 import json
 import sys
-from typing import NoReturn
+from typing import Any, NoReturn
 
 from . import __version__
 from .exceptions import PlatformDetectionError
@@ -47,6 +47,9 @@ def main() -> NoReturn:
     )
 
     subparsers = parser.add_subparsers(dest="command", help="Available commands")
+
+    # Update command
+    add_update_subcommand(subparsers)
 
     # Doctor command
     doctor_parser = subparsers.add_parser(
@@ -92,6 +95,9 @@ def main() -> NoReturn:
 
     if args.command == "doctor":
         exit_code = cmd_doctor(args)
+        sys.exit(exit_code)
+    elif args.command == "update":
+        exit_code = cmd_update(args)
         sys.exit(exit_code)
     else:
         parser.print_help()
@@ -354,6 +360,112 @@ def _color(color: str, text: str) -> str:
     color_code = colors.get(color, "")
 
     return f"{color_code}{text}{reset}"
+
+
+def add_update_subcommand(subparsers: Any) -> None:
+    """Add update subcommand.
+
+    Args:
+        subparsers: Subparsers object from argparse
+    """
+    update_parser = subparsers.add_parser(
+        "update", help="Check for and install package updates"
+    )
+    update_parser.add_argument(
+        "--check",
+        action="store_true",
+        help="Only check for updates, don't install",
+    )
+    update_parser.add_argument(
+        "--yes",
+        "-y",
+        action="store_true",
+        help="Skip confirmation prompt",
+    )
+    update_parser.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="Show what would be done without doing it",
+    )
+    update_parser.add_argument(
+        "--package",
+        "-p",
+        default="py-mcp-installer",
+        help="Package name to update (default: py-mcp-installer)",
+    )
+    update_parser.add_argument(
+        "--json",
+        action="store_true",
+        help="Output in JSON format",
+    )
+
+
+def cmd_update(args: argparse.Namespace) -> int:
+    """Handle update subcommand.
+
+    Args:
+        args: Parsed command line arguments
+
+    Returns:
+        Exit code (0 for success, 1 for failure)
+    """
+    from .self_updater import SelfUpdater
+
+    try:
+        updater = SelfUpdater(args.package)
+        result = updater.check_for_updates()
+
+        if args.json:
+            output = {
+                "package": result.package_name,
+                "current_version": result.current_version,
+                "latest_version": result.latest_version,
+                "update_available": result.update_available,
+                "install_method": result.install_method.value,
+                "upgrade_command": result.upgrade_command,
+            }
+            print(json.dumps(output, indent=2))
+            return 0
+
+        # Text output
+        print(f"\nPackage: {result.package_name}")
+        print(f"Installed: {result.current_version} (via {result.install_method.value})")
+        print(f"Latest: {result.latest_version}")
+
+        if not result.update_available:
+            print(f"\n{_color('green', '✅ Already up to date!')}")
+            return 0
+
+        print(
+            f"\n{_color('yellow', '🔄 Update available')}: "
+            f"{result.current_version} → {result.latest_version}"
+        )
+        print(f"   Command: {result.upgrade_command}")
+
+        if args.check:
+            return 0
+
+        # Run update
+        success = updater.update(
+            dry_run=args.dry_run,
+            confirm=not args.yes,
+        )
+
+        if success and not args.dry_run:
+            print(f"\n{_color('green', '✅ Update complete!')}")
+            return 0
+        elif args.dry_run:
+            return 0
+        else:
+            print(f"\n{_color('red', '❌ Update failed')}")
+            return 1
+
+    except Exception as e:
+        if args.json:
+            print(json.dumps({"error": str(e)}, indent=2))
+        else:
+            print(f"\n{_color('red', 'ERROR')}: {e}")
+        return 1
 
 
 if __name__ == "__main__":
