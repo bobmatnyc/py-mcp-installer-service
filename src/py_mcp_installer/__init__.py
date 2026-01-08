@@ -73,6 +73,15 @@ from .platforms import (
     CodexStrategy,
     CursorStrategy,
 )
+
+# Self-updater
+from .self_updater import (
+    InstallMethod as SelfUpdateInstallMethod,
+)
+from .self_updater import (
+    SelfUpdater,
+    UpdateCheckResult,
+)
 from .types import (
     ArgsList,
     ConfigFormat,
@@ -88,13 +97,6 @@ from .types import (
     PlatformInfo,
     Scope,
     ServerStatus,
-)
-
-# Self-updater
-from .self_updater import (
-    InstallMethod as SelfUpdateInstallMethod,
-    SelfUpdater,
-    UpdateCheckResult,
 )
 
 # Utilities

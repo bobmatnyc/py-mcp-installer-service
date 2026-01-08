@@ -6,10 +6,10 @@ import json
 import subprocess
 import sys
 import urllib.request
+from collections.abc import Callable
 from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path
-from typing import Callable, Optional
 
 
 class InstallMethod(Enum):
@@ -49,7 +49,7 @@ class SelfUpdater:
 
     PYPI_API_URL = "https://pypi.org/pypi/{package}/json"
 
-    def __init__(self, package_name: str, current_version: Optional[str] = None):
+    def __init__(self, package_name: str, current_version: str | None = None):
         """Initialize SelfUpdater.
 
         Args:
@@ -58,7 +58,7 @@ class SelfUpdater:
         """
         self.package_name = package_name
         self._current_version = current_version
-        self._install_method: Optional[InstallMethod] = None
+        self._install_method: InstallMethod | None = None
 
     @property
     def current_version(self) -> str:
@@ -125,13 +125,13 @@ class SelfUpdater:
         }
         return commands[self.install_method]
 
-    def get_latest_version(self) -> Optional[str]:
+    def get_latest_version(self) -> str | None:
         """Fetch latest version from PyPI."""
         url = self.PYPI_API_URL.format(package=self.package_name)
         try:
             with urllib.request.urlopen(url, timeout=10) as response:
                 data = json.loads(response.read().decode())
-                version: Optional[str] = data.get("info", {}).get("version")
+                version: str | None = data.get("info", {}).get("version")
                 return version
         except Exception:
             return None
@@ -184,7 +184,7 @@ class SelfUpdater:
         self,
         dry_run: bool = False,
         confirm: bool = True,
-        confirm_callback: Optional[Callable[[], bool]] = None,
+        confirm_callback: Callable[[], bool] | None = None,
     ) -> bool:
         """Run the upgrade command.
 

@@ -428,7 +428,7 @@ class MCPInstaller:
                     return []
 
                 # Read and parse JSON file
-                with open(config_path, 'r') as f:
+                with open(config_path) as f:
                     config = json.load(f)
 
                 # Extract mcpServers section
