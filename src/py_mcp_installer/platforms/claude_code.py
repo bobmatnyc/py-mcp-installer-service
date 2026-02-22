@@ -95,12 +95,14 @@ class ClaudeCodeStrategy:
             >>> if installer.validate():
             ...     result = installer.install(server, Scope.PROJECT)
         """
+        config_path = self.get_config_path(scope)
+
         # Prefer native CLI if available
         if resolve_command_path("claude"):
-            return NativeCLIStrategy(self.platform, "claude")
+            # Pass config_path so list_servers can fall back to JSON reading
+            return NativeCLIStrategy(self.platform, "claude", config_path)
 
         # Fallback to JSON manipulation
-        config_path = self.get_config_path(scope)
         return JSONManipulationStrategy(self.platform, config_path)
 
     def get_strategy_with_fallback(
@@ -130,7 +132,8 @@ class ClaudeCodeStrategy:
         # Primary: Native CLI if available
         primary: InstallationStrategy | None = None
         if resolve_command_path("claude"):
-            primary = NativeCLIStrategy(self.platform, "claude")
+            # Pass config_path for list_servers fallback
+            primary = NativeCLIStrategy(self.platform, "claude", config_path)
 
         # Fallback: Always JSON
         fallback = JSONManipulationStrategy(self.platform, config_path)

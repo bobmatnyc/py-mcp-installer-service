@@ -139,18 +139,20 @@ class NativeCLIStrategy(InstallationStrategy):
         ...     result = fallback.install(server, Scope.PROJECT)
     """
 
-    def __init__(self, platform: Platform, cli_command: str) -> None:
+    def __init__(self, platform: Platform, cli_command: str, config_path: Path | None = None) -> None:
         """Initialize with platform and CLI command.
 
         Args:
             platform: Target platform
             cli_command: CLI command name (e.g., "claude", "auggie")
+            config_path: Optional config path for list_servers fallback
 
         Example:
             >>> strategy = NativeCLIStrategy(Platform.CLAUDE_CODE, "claude")
         """
         self.platform = platform
         self.cli_command = cli_command
+        self.config_path = config_path
 
     def install(self, server: MCPServerConfig, scope: Scope) -> InstallationResult:
         """Install server using native CLI.
@@ -264,16 +266,27 @@ class NativeCLIStrategy(InstallationStrategy):
         """List servers using native CLI.
 
         Note: Most CLIs don't provide list functionality,
-        so this falls back to JSON reading.
+        so this falls back to JSON reading if config_path is available.
 
         Args:
             scope: Installation scope
 
         Returns:
-            List of server configurations
+            List of server configurations (empty list if config unavailable)
         """
-        # Most CLIs don't support listing, would need config path
-        raise NotImplementedError("Native CLI list not supported, use JSON strategy")
+        # Most CLIs don't support listing, fall back to JSON reading
+        if self.config_path is None:
+            # No config path provided, can't read config
+            # Return empty list instead of raising (graceful degradation)
+            return []
+
+        try:
+            # Use ConfigManager to read config file
+            config_manager = ConfigManager(self.config_path, ConfigFormat.JSON)
+            return config_manager.list_servers()
+        except Exception:
+            # Config doesn't exist or can't be read, return empty list
+            return []
 
     def validate(self) -> bool:
         """Check if CLI command is available.
