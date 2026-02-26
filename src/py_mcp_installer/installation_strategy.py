@@ -562,11 +562,8 @@ class JSONManipulationStrategy(InstallationStrategy):
         """
         try:
             return self.config_manager.list_servers()
-        except Exception as e:
-            raise InstallationError(
-                f"Failed to list servers: {e}",
-                recovery_suggestion="Check config file exists and is readable",
-            ) from e
+        except Exception:
+            return []  # graceful degradation, consistent with NativeCLIStrategy
 
     def validate(self) -> bool:
         """Check if JSON config exists and is valid.
@@ -732,11 +729,8 @@ class TOMLManipulationStrategy(InstallationStrategy):
         """
         try:
             return self.config_manager.list_servers()
-        except Exception as e:
-            raise InstallationError(
-                f"Failed to list servers: {e}",
-                recovery_suggestion="Check TOML file exists and is readable",
-            ) from e
+        except Exception:
+            return []  # graceful degradation, consistent with NativeCLIStrategy
 
     def validate(self) -> bool:
         """Check if TOML config exists and is valid.
